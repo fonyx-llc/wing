@@ -1,9 +1,4 @@
-#[derive(PartialEq)]
-pub enum TriggerMode {
-	RisingEdge,
-	FallingEdge,
-	BothEdges,
-}
+use crate::common::trigger_driver::{should_trigger, TriggerMode};
 
 pub struct PIPORegister {
 	pub byte_quantity: usize,
@@ -32,15 +27,15 @@ impl PIPORegister {
 		self.byte_buffer[index] = byte;
 	}
 
-	pub fn set_clock_state(&mut self, clock_state: bool) {
-		if clock_state != self.clock_state {
+	pub fn set_clock_state(&mut self, clock_state: bool) -> bool {
+		let changing = should_trigger(self.clock_state, clock_state, self.trigger_mode.clone());
+		if changing {
 			self.clock_state = clock_state;
-			if self.trigger_mode == TriggerMode::BothEdges
-				|| self.trigger_mode == TriggerMode::RisingEdge && clock_state
-				|| self.trigger_mode == TriggerMode::FallingEdge && !clock_state {
-				self.trigger();
-			}
+			self.trigger();
+		} else {
+			self.clock_state = clock_state;
 		}
+		changing
 	}
 
 	fn trigger(&self) {
