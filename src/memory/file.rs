@@ -20,12 +20,10 @@ pub struct File {
 
 impl File {
 	pub fn new(byte_quantity: usize, trigger_mode: TriggerMode) -> File {
-		let mut byte_buffer = PIPORegister::new(byte_quantity, trigger_mode.clone());
-
 		File {
+			byte_buffer: PIPORegister::new(byte_quantity, trigger_mode.clone()),
 			byte_quantity,
 			trigger_mode,
-			byte_buffer,
 			change_listeners: Vec::new(),
 			output_listeners: Vec::new(),
 			clock_state: false,
