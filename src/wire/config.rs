@@ -1,6 +1,5 @@
 use serde_derive::Deserialize;
 use std::fs;
-use std::process::exit;
 use thiserror::Error;
 use toml;
 
@@ -28,7 +27,7 @@ pub struct ProjectBuildConfig {
 
 pub fn read_project_file(directory: &str) -> Result<ProjectBuildConfig, ConfigReadError> {
 	let raw_data = match fs::read_to_string(format!("{}project.build", directory)) {
-		Ok(c) => c,
+		Ok(c) => c.replace("->", "="),
 		Err(reason) => {
 			return if reason.kind() == std::io::ErrorKind::NotFound {
 				Err(ConfigReadError::NoConfigFile(directory))

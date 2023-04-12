@@ -1,8 +1,6 @@
 use std::process::exit;
-use super::config::{read_project_file, ConfigReadError};
+use super::config::read_project_file;
 use spinners::{Spinner, Spinners};
-use std::thread::sleep;
-use std::time::Duration;
 
 pub fn handle() {
 	let mut sp = Spinner::new(Spinners::Dots9, "Attempting to load configuration file".into());
