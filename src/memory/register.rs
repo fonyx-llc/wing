@@ -10,9 +10,6 @@ pub struct PIPORegister {
 	pub clock_state: bool,
 	pub trigger_mode: TriggerMode,
 	pub byte_buffer: Vec<u8>,
-	// pub already_triggered_rising_edge: bool,
-	// pub already_triggered_falling_edge: bool,
-
 	change_listeners: Vec<fn(&PIPORegister)>,
 }
 
@@ -22,8 +19,6 @@ impl PIPORegister {
 			clock_state: false,
 			change_listeners: Vec::new(),
 			byte_buffer: vec![0; byte_quantity],
-			// already_triggered_rising_edge: false,
-			// already_triggered_falling_edge: false,
 			byte_quantity,
 			trigger_mode,
 		}
