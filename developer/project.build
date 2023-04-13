@@ -1,4 +1,6 @@
 [project]
 name -> "test_os"
 owner -> "user_test"
-intention -> "bootable"
+
+[workspace]
+include -> ["/bootstrap/"]

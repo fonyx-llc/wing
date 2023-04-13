@@ -12,17 +12,23 @@ pub enum ConfigReadError<'a> {
 	InvalidConfigFile(&'a str, String),
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct ProjectBuildConfigProject {
 	pub name: String,
 	pub owner: String,
 	pub description: Option<String>,
-	pub intention: String,
+	pub target_directory: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
+pub struct ProjectBuildConfigWorkspace {
+	pub include: Vec<String>,
+}
+
+#[derive(Deserialize, Clone)]
 pub struct ProjectBuildConfig {
 	pub project: ProjectBuildConfigProject,
+	pub workspace: ProjectBuildConfigWorkspace,
 }
 
 pub fn read_project_file(directory: &str) -> Result<ProjectBuildConfig, ConfigReadError> {
@@ -37,12 +43,16 @@ pub fn read_project_file(directory: &str) -> Result<ProjectBuildConfig, ConfigRe
 		}
 	};
 
-	let raw_config: ProjectBuildConfig = match toml::from_str(&raw_data) {
+	let mut raw_config: ProjectBuildConfig = match toml::from_str(&raw_data) {
 		Ok(c) => c,
 		Err(reason) => {
 			return Err(ConfigReadError::InvalidConfigFile(directory, reason.to_string()))
 		}
 	};
+
+	if raw_config.project.target_directory.is_none() {
+		raw_config.project.target_directory = Some("/build/".to_string());
+	}
 
 	Ok(raw_config)
 }
