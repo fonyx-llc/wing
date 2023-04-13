@@ -1,5 +1,5 @@
 use std::process::exit;
-use crate::wire::config::ProjectBuildConfig;
+use crate::wing::config::ProjectBuildConfig;
 
 pub fn prepare_for_build(config: ProjectBuildConfig, root_directory: &str) {
 	let target_directory = config.project.target_directory.unwrap();

@@ -1,12 +1,12 @@
 [package]
-name = "wire"
+name = "wing"
 version = "0.1.0"
 edition = "2021"
 authors = [
     "Fonyx < Rayyan Khan (RK7) xlangk@proton.me",
     "Fonyx < Chase Barve (YYurpy) unknown@none.false"
 ]
-description = "Fonyx Wire is a robust emulator and runtime that enables efficient emulation and execution of Fonyx Lighting architecture code on Microsoft Windows."
+description = "Fonyx Wing is a robust emulator and runtime that enables efficient emulation and execution of Fonyx Lighting architecture code on Microsoft Windows."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -9,7 +9,7 @@
 
     <Product
         Id='*'
-        Name='wire'
+        Name='wing'
         UpgradeCode='2D955D2A-F8DC-48D3-AFC5-0398A886D781'
         Manufacturer='Fonyx &lt; Rayyan Khan (RK7) xlangk@proton.me'
         Language='1033'
@@ -18,7 +18,7 @@
 
         <Package Id='*'
             Keywords='Installer'
-            Description='Fonyx Wire is a robust emulator and runtime that enables efficient emulation and execution of Fonyx Lighting architecture code on Microsoft Windows.'
+            Description='Fonyx Wing is a robust emulator and runtime that enables efficient emulation and execution of Fonyx Lighting architecture code on Microsoft Windows.'
             Manufacturer='Fonyx &lt; Rayyan Khan (RK7) xlangk@proton.me'
             InstallerVersion='450'
             Languages='1033'
@@ -32,11 +32,11 @@
             DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.'/>
 
         <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
-        <Property Id='DiskPrompt' Value='wire Installation'/>
+        <Property Id='DiskPrompt' Value='wing Installation'/>
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
-                <Directory Id='APPLICATIONFOLDER' Name='wire'>
+                <Directory Id='APPLICATIONFOLDER' Name='wing'>
                     <Directory Id='Bin' Name='bin'>
                         <Component Id='Path' Guid='7B7D6906-D2D5-4480-9A98-BB9B3249E88D' KeyPath='yes'>
                             <Environment
@@ -51,9 +51,9 @@
                         <Component Id='binary0' Guid='*'>
                             <File
                                 Id='exe0'
-                                Name='wire.exe'
+                                Name='wing.exe'
                                 DiskId='1'
-                                Source='$(var.CargoTargetBinDir)\wire.exe'
+                                Source='$(var.CargoTargetBinDir)\wing.exe'
                                 KeyPath='yes'/>
                         </Component>
                     </Directory>
