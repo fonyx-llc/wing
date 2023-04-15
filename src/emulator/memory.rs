@@ -103,9 +103,7 @@ impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleSt
 
 	pub fn set_chip_select(&mut self, chip_select: bool) {
 		self.chip_select = chip_select;
-		self.data_feed_demultiplexer.set_chip_select(chip_select);
 		self.data_read_multiplexer.set_chip_select(chip_select);
-		self.control_demultiplexer.set_chip_select(chip_select);
 		self.apply_control_demultiplexer();
 	}
 
@@ -115,8 +113,10 @@ impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleSt
 	}
 
 	pub fn set_clock(&mut self, clock_bit: bool) {
-		self.clock_bit = clock_bit;
-		self.apply_control_demultiplexer();
+		if clock_bit != self.clock_bit {
+			self.clock_bit = clock_bit;
+			self.apply_control_demultiplexer();
+		}
 	}
 
 	pub fn set_address(&mut self, address: Address) {
@@ -130,6 +130,9 @@ impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleSt
 	}
 
 	fn apply_control_demultiplexer(&mut self) {
+		self.data_feed_demultiplexer.set_chip_select(true);
+		self.control_demultiplexer.set_chip_select(true);
+
 		let control_word = (self.chip_select as u8) | ((self.write_enable as u8) << 1) | ((self.clock_bit as u8) << 2);
 		self.control_demultiplexer.set_input_word(control_word);
 		self.control_demultiplexer.set_selector(self.queued_address);
@@ -150,7 +153,7 @@ impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleSt
 		self.data_feed_demultiplexer.set_selector(self.queued_address);
 
 		let mut address_index = Address::zero();
-		for (memory_line_index, memory_line) in self.memory_lines.iter_mut().enumerate() {
+		for (_, memory_line) in self.memory_lines.iter_mut().enumerate() {
 			let data_word = self.data_feed_demultiplexer.read_word(address_index);
 			memory_line.set_queued_input(data_word);
 

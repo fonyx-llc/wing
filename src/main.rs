@@ -9,12 +9,13 @@ fn main() {
 
     ssram.set_address(0);
     ssram.set_feed(0x42);
-    
+
     ssram.set_clock(true);
     ssram.set_clock(false);
-    
+
     ssram.set_chip_select(true);
     ssram.set_write_enable(false);
 
-    println!("Data at address 0: {}", ssram.read_word());
+    println!("Data at address 0: {}",
+             ssram.read_word());
 }
