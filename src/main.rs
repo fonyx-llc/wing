@@ -1,33 +1,28 @@
-use crate::emulator::memory::{StaticRandomAccessMemory, StaticRandomAccessMemoryDriver};
+use crate::emulator::memory::{MemoryController, StaticRandomAccessMemory, StaticRandomAccessMemoryDriver};
 pub mod emulator;
 
 fn main() {
-    let block_a: StaticRandomAccessMemory<usize, usize> = StaticRandomAccessMemory::new(1024);
-    let block_b: StaticRandomAccessMemory<usize, usize> = StaticRandomAccessMemory::new(1024);
-    let block_c: StaticRandomAccessMemory<usize, usize> = StaticRandomAccessMemory::new(1024);
-    let block_d: StaticRandomAccessMemory<usize, usize> = StaticRandomAccessMemory::new(1024);
-    let mut blocks = [block_a, block_b, block_c, block_d];
+    let block_a: StaticRandomAccessMemory<usize, usize> = StaticRandomAccessMemory::new(16);
+    let mut blocks = [block_a];
 
     let mut ram = StaticRandomAccessMemoryDriver::new(&mut blocks);
+    let mut memory_controller = MemoryController::new(4, &mut ram);
 
-    ram.set_chip_select(true);
-    ram.set_write_enable(true);
+    memory_controller.set_chip_select(true, 0);
+    memory_controller.set_write_enable(true, 0);
+    memory_controller.set_chip_select(true, 1);
+    memory_controller.set_write_enable(true, 1);
 
-    ram.set_address(1000);
-    ram.set_feed(127);
+    memory_controller.set_address(0, 0);
+    memory_controller.set_address(0, 1);
+    memory_controller.set_feed(1, 0);
+    memory_controller.set_feed(2, 1);
 
-    ram.set_clock(true);
-    ram.set_clock(false);
+    memory_controller.set_clock(true);
+    memory_controller.set_clock(false);
+    memory_controller.set_clock(true);
+    memory_controller.set_clock(false);
 
-    let data = ram.read_word();
-    println!("Data: {}", data);
-
-    ram.set_address(1);
-    ram.set_feed(255);
-
-    ram.set_clock(true);
-    ram.set_clock(false);
-
-    let data = ram.read_word();
-    println!("Data: {}", data);
+    println!("Core: 0, data: {}", memory_controller.read_word(0));
+    println!("Core: 1, data: {}", memory_controller.read_word(1));
 }

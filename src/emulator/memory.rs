@@ -1,3 +1,4 @@
+use std::cmp::{max, min};
 use num_traits::{Zero, Num, ToPrimitive, FromPrimitive};
 use crate::emulator::signal::{Demultiplexer, Multiplexer};
 
@@ -250,5 +251,132 @@ impl<'a, Word: Copy + Num + Zero, Address: Copy + Num + Zero + FromPrimitive + T
 
 	pub fn get_address_bits(&self) -> Address {
 		self.bits
+	}
+}
+
+#[derive(PartialEq, Clone)]
+pub enum MemoryControllerQueueJob {
+	Idle,
+	Read,
+	Write,
+}
+
+#[derive(Clone)]
+pub struct MemoryControllerQueue<Word: Copy + Num + Zero, Address: Copy + Num + Zero> {
+	chip_select: bool,
+	write_enable: bool,
+	address: Address,
+	data: Word,
+	response_data: Word,
+}
+
+impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero> MemoryControllerQueue<Word, Address> {
+	pub fn new() -> Self {
+		MemoryControllerQueue {
+			chip_select: false,
+			write_enable: false,
+			address: Address::zero(),
+			data: Word::zero(),
+			response_data: Word::zero(),
+		}
+	}
+
+	pub fn set_chip_select(&mut self, chip_select: bool) {
+		self.chip_select = chip_select;
+	}
+
+	pub fn set_write_enable(&mut self, write_enable: bool) {
+		self.write_enable = write_enable;
+	}
+
+	pub fn get_chip_select(&self) -> bool {
+		self.chip_select
+	}
+
+	pub fn get_write_enable(&self) -> bool {
+		self.write_enable
+	}
+
+	pub fn set_address(&mut self, address: Address) {
+		self.address = address;
+	}
+
+	pub fn set_data(&mut self, data: Word) {
+		self.data = data;
+	}
+
+	pub fn get_address(&self) -> Address {
+		self.address
+	}
+
+	pub fn get_data(&self) -> Word {
+		self.data
+	}
+
+	pub fn get_response_data(&self) -> Word {
+		self.response_data
+	}
+
+	pub fn set_response_data(&mut self, response_data: Word) {
+		self.response_data = response_data;
+	}
+}
+
+pub struct MemoryController<'a, Word: Copy + Num + Zero, Address: Copy + Num + Zero + FromPrimitive + ToPrimitive> {
+	memory_driver: &'a mut StaticRandomAccessMemoryDriver<'a, Word, Address>,
+	focus: usize,
+	queues: Vec<MemoryControllerQueue<Word, Address>>,
+	clock: bool,
+}
+
+impl<'a, Word: Copy + Num + Zero, Address: Copy + Num + Zero + FromPrimitive + ToPrimitive> MemoryController<'a, Word, Address> {
+	pub fn new(cores: usize, memory_driver: &'a mut StaticRandomAccessMemoryDriver<'a, Word, Address>) -> Self {
+		MemoryController {
+			memory_driver,
+			focus: 0,
+			queues: vec![MemoryControllerQueue::new(); cores],
+			clock: false,
+		}
+	}
+
+	pub fn set_clock(&mut self, clock: bool) {
+		if clock != self.clock {
+			self.clock = clock;
+			self.memory_driver.set_chip_select(self.queues[self.focus].chip_select);
+			self.memory_driver.set_write_enable(self.queues[self.focus].write_enable);
+			self.memory_driver.set_address(self.queues[self.focus].address);
+			self.memory_driver.set_feed(self.queues[self.focus].data);
+			self.memory_driver.set_clock(clock);
+
+			if clock { self.queues[self.focus].response_data = self.memory_driver.read_word(); }
+			else if !clock {
+				self.focus += 1;
+				if self.focus >= self.queues.len() { self.focus = 0; }
+			}
+		}
+	}
+
+	pub fn set_chip_select(&mut self, chip_select: bool, core: usize) {
+		self.queues[core].chip_select = chip_select;
+	}
+
+	pub fn set_write_enable(&mut self, write_enable: bool, core: usize) {
+		self.queues[core].write_enable = write_enable;
+	}
+
+	pub fn set_address(&mut self, address: Address, core: usize) {
+		self.queues[core].address = address;
+	}
+
+	pub fn set_feed(&mut self, input_data: Word, core: usize) {
+		self.queues[core].data = input_data;
+	}
+
+	pub fn read_word(&mut self, core: usize) -> Word {
+		self.queues[core].response_data
+	}
+
+	pub fn get_address_bits(&self) -> Address {
+		self.memory_driver.get_address_bits()
 	}
 }
