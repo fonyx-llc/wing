@@ -1,6 +1,0 @@
-[project]
-name -> "test_os"
-owner -> "user_test"
-
-[workspace]
-include -> ["/bootstrap/"]

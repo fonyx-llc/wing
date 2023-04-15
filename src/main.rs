@@ -1,10 +1,13 @@
-pub mod common;
-pub mod execution_unit;
-pub mod machine;
-pub mod memory;
-pub mod processor;
-pub mod wing;
+pub mod emulator;
+use emulator::register::{RegisterParallelInParallelOut};
+use crate::emulator::signal::{Demultiplexer, Multiplexer};
 
 fn main() {
-    wing::main::handle();
+    let mut demux: Demultiplexer<u8, u8> = Demultiplexer::new(8);
+
+    demux.set_chip_select(true);
+    demux.set_selector(1);
+    demux.set_input_word(10);
+
+    println!("Mux output: {}", demux.read_word(1));
 }
