@@ -1,14 +1,6 @@
-<br />
-<br />
-<br />
-
 <div align="center">
 	<img src="logo.png" alt="Logo" />
 </div>
-
-<br />
-<br />
-<br />
 
 # We can only destroy Google, Microsoft, etc... together...
 Let's take back our power from Google, Microsoft and other profit only proprietary companies.
