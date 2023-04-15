@@ -1,4 +1,4 @@
-use num_traits::{Zero, Num, ToPrimitive};
+use num_traits::{Zero, Num, ToPrimitive, FromPrimitive};
 use crate::emulator::signal::{Demultiplexer, Multiplexer};
 
 #[derive(Debug, Clone)]
@@ -55,8 +55,8 @@ impl Default for RegisterParallelInParallelOut<u8> {
 	}
 }
 
-#[derive(Debug)]
-pub struct SingleStaticRandomAccessMemory<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> {
+#[derive(Debug, Clone)]
+pub struct StaticRandomAccessMemory<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> {
 	/// This demultiplexer will be used for feeding data into the demultiplexer,
 	/// this demultiplexer is a wide demultiplexer that feeds data in with 1 clock cycle.
 	data_feed_demultiplexer: Demultiplexer<Address, Word>,
@@ -86,9 +86,9 @@ pub struct SingleStaticRandomAccessMemory<Word: Copy + Num + Zero, Address: Copy
 	memory_lines: Vec<RegisterParallelInParallelOut<Word>>,
 }
 
-impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleStaticRandomAccessMemory<Word, Address> {
+impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> StaticRandomAccessMemory<Word, Address> {
 	pub fn new(address_space_count: Address) -> Self {
-		SingleStaticRandomAccessMemory {
+		StaticRandomAccessMemory {
 			data_feed_demultiplexer: Demultiplexer::new(address_space_count),
 			data_read_multiplexer: Multiplexer::new(address_space_count),
 			control_demultiplexer: Demultiplexer::new(address_space_count),
@@ -173,5 +173,82 @@ impl<Word: Copy + Num + Zero, Address: Copy + Num + Zero + ToPrimitive> SingleSt
 			memory_line_index = memory_line_index + Address::one();
 		}
 		self.data_read_multiplexer.read_word()
+	}
+
+	pub fn get_memory_lines_count(&self) -> usize {
+		self.memory_lines.len()
+	}
+}
+
+pub struct StaticRandomAccessMemoryDriver<'a, Word: Copy + Num + Zero, Address: Copy + Num + Zero + FromPrimitive + ToPrimitive> {
+	memory_blocks: &'a mut [StaticRandomAccessMemory<Word, Address>],
+	bits: Address,
+	address: Address,
+}
+
+impl<'a, Word: Copy + Num + Zero, Address: Copy + Num + Zero + FromPrimitive + ToPrimitive> StaticRandomAccessMemoryDriver<'a, Word, Address> {
+	pub fn new(memory_blocks: &'a mut [StaticRandomAccessMemory<Word, Address>]) -> Self {
+		let mut total_addresses = 0;
+		for memory_block in memory_blocks.iter() {
+			total_addresses += memory_block.get_memory_lines_count();
+		}
+		let bit_count = (f64::log2(total_addresses as f64) / f64::log2(2.0)).ceil() as usize;
+
+		StaticRandomAccessMemoryDriver {
+			memory_blocks,
+			bits: Address::from_usize(bit_count).unwrap(),
+			address: Address::zero(),
+		}
+	}
+
+	fn determine_block_index(&self, address: Address) -> usize {
+		let mut address_lines_prev = Address::zero();
+		for (block_index, memory_block) in self.memory_blocks.iter().enumerate() {
+			let address_lines = address_lines_prev + Address::from_usize(memory_block.get_memory_lines_count()).unwrap();
+			if address.to_usize().unwrap() < address_lines.to_usize().unwrap() {
+				return block_index;
+			}
+			address_lines_prev = address_lines;
+		}
+		panic!("Address out of bounds");
+	}
+
+	pub fn read_word(&mut self) -> Word {
+		self.memory_blocks[self.determine_block_index(self.address)].read_word()
+	}
+
+	pub fn set_chip_select(&mut self, chip_select: bool) {
+		for memory_block in self.memory_blocks.iter_mut() {
+			memory_block.set_chip_select(chip_select);
+		}
+	}
+
+	pub fn set_write_enable(&mut self, write_enable: bool) {
+		for memory_block in self.memory_blocks.iter_mut() {
+			memory_block.set_write_enable(write_enable);
+		}
+	}
+
+	pub fn set_clock(&mut self, clock_bit: bool) {
+		for memory_block in self.memory_blocks.iter_mut() {
+			memory_block.set_clock(clock_bit);
+		}
+	}
+
+	pub fn set_address(&mut self, address: Address) {
+		self.address = address;
+		for memory_block in self.memory_blocks.iter_mut() {
+			memory_block.set_address(address);
+		}
+	}
+
+	pub fn set_feed(&mut self, input_data: Word) {
+		for memory_block in self.memory_blocks.iter_mut() {
+			memory_block.set_feed(input_data);
+		}
+	}
+
+	pub fn get_address_bits(&self) -> Address {
+		self.bits
 	}
 }
