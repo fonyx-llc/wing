@@ -1,5 +1,6 @@
 use num_traits::{Num, ToPrimitive, Zero};
 
+#[derive(Debug, Clone)]
 pub struct Multiplexer<Selector: Copy + Num + Zero + ToPrimitive, DataWord: Copy + Num + Zero> {
 	inputs: Vec<DataWord>,
 	input_selector: Selector,
@@ -42,6 +43,7 @@ impl<Selector: Copy + Num + Zero + ToPrimitive, DataWord: Copy + Num + Zero> Mul
 	}
 }
 
+#[derive(Debug, Clone)]
 pub struct Demultiplexer<Selector: Copy + Num + Zero + ToPrimitive, DataWord: Copy + Num + Zero> {
 	input: DataWord,
 	output_selector: Selector,
