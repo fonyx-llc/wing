@@ -1,4 +1,5 @@
 [workspace]
 members = [
-    "./lighting_architecture"
+    "main",
+    "memory"
 ]
