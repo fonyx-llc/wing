@@ -1,11 +1,17 @@
 //! FF (Flip Flop) module contains logical FF emulators which perform realistic operations
 //! of which would be done by a real FF integrated circuit.
 
+/// A Flip Flop (FF)
+pub enum FF {
+	TFf(TFf),
+	SrFf(SrFf),
+}
+
 /// SRFF (Set Reset Flip Flop) is a clocked FF (Flip Flop) with 2 inputs.
 /// This FF allows for basic bit or word setting with reset
 /// functionality.
 pub struct SrFf {
-	pub bit: bool,
+	pub bit: bool, EDIT NAMES ACRONYMS ORDER
 	pub clock: bool,
 
 	/// If this is true, the flip flop will trigger on the falling edge of the clock,
