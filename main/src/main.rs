@@ -1,3 +1,5 @@
+use wire_memory::ff::TFf;
+
 fn main() {
-	println!("Hello, world!");
+	let mut t_ff = TFf::new(false);
 }

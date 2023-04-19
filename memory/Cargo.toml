@@ -1,5 +1,5 @@
 [package]
-name = "memory"
+name = "wire_memory"
 version = "0.0.1"
 edition = "2021"
 
