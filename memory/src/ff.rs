@@ -1,24 +1,24 @@
 //! FF (Flip Flop) module contains logical FF emulators which perform realistic operations
 //! of which would be done by a real FF integrated circuit.
 
-/// A Flip Flop (FF)
+/// Universal FF type.
 pub enum FF {
 	TFf(TFf),
 	SrFf(SrFf),
 }
 
-/// SRFF (Set Reset Flip Flop) is a clocked FF (Flip Flop) with 2 inputs.
+/// Set Reset (SR) FF is a clocked FF with 2 inputs.
 /// This FF allows for basic bit or word setting with reset
 /// functionality.
 pub struct SrFf {
-	pub bit: bool, EDIT NAMES ACRONYMS ORDER
+	pub bit: bool,
 	pub clock: bool,
 
-	/// If this is true, the flip flop will trigger on the falling edge of the clock,
+	/// If this is true, the FF will trigger on the falling edge of the clock,
 	/// otherwise it will trigger on the rising edge.
 	pub trigger_falling: bool,
 
-	/// This is the input of the flip flip that is queued to be applied when the clock
+	/// This is the input of the FF that is queued to be applied when the clock
 	/// meets the trigger mode.
 	pub input_queue: bool,
 
@@ -28,7 +28,7 @@ pub struct SrFf {
 
 impl SrFf {
 	/// # Arguments
-	///  - trigger_mode: When true, the flip flop will trigger on the falling edge of the clock,
+	///  - trigger_mode: When true, the FF will trigger on the falling edge of the clock,
 	/// otherwise it will trigger on the rising edge.
 	pub fn new(trigger_falling: bool) -> Self {
 		Self {
@@ -118,14 +118,14 @@ fn test_sr_ff_falling() {
 	assert!(!sr_ff.bit);
 }
 
-/// TFF (Toggle Flip Flop) is a clocked FF (Flip Flop) with 1 input.
+/// Toggle (T) FF is a clocked FF with 1 input.
 /// This FF will toggle its internal value if the input is high
 /// and the clock meets the trigger mode.
 pub struct TFf {
 	pub bit: bool,
 	pub clock: bool,
 
-	/// If this is true, the flip flop will trigger on the falling edge of the clock,
+	/// If this is true, the FF will trigger on the falling edge of the clock,
 	/// otherwise it will trigger on the rising edge.
 	pub trigger_falling: bool,
 
@@ -136,7 +136,7 @@ pub struct TFf {
 
 impl TFf {
 	/// # Arguments
-	///  - trigger_mode: When true, the flip flop will trigger on the falling edge of the clock,
+	///  - trigger_mode: When true, the FF will trigger on the falling edge of the clock,
 	/// otherwise it will trigger on the rising edge.
 	pub fn new(trigger_falling: bool) -> Self {
 		Self {

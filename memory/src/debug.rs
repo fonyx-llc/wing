@@ -7,7 +7,7 @@ use super::ff::FF;
 ///  - ffs: (Flip Flops) A vector of flip flops to print.
 pub fn print_ffs(ffs: Vec<FF>) {
 	for ff in ffs {
-		print!("{}", if ff.bit { "▓" } else { "a" });
+
 	}
 	println!();
 }
